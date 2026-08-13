@@ -1,4 +1,3 @@
-@'
 """
 Django settings for backend project.
 
@@ -164,4 +163,3 @@ SIMPLE_JWT = {
     'BLACKLIST_AFTER_ROTATION': True,
     'AUTH_HEADER_TYPES':('Bearer'),
 }
-'@ | Set-Content -Path "backend\backend\settings.py" -Encoding utf8
