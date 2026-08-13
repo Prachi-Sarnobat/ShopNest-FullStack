@@ -45,11 +45,19 @@ def get_product(request, product_id):
 
 
 @api_view(['GET'])
-@permission_classes([IsAuthenticated])
 def get_cart(request):
-    cart, created = Cart.objects.get_or_create(
-        user=request.user
-    )
+    if request.user.is_authenticated:
+        cart, created = Cart.objects.get_or_create(
+            user=request.user
+        )
+    else:
+        cart_id = request.session.get('cart_id')
+        cart = None
+        if cart_id:
+            cart = Cart.objects.filter(id=cart_id, user__isnull=True).first()
+        if cart is None:
+            cart = Cart.objects.create(user=None)
+            request.session['cart_id'] = cart.id
 
     serializer = CartSerializer(cart)
 
@@ -57,7 +65,7 @@ def get_cart(request):
 
 @csrf_exempt
 @api_view(['POST'])
-@permission_classes(IsAuthenticated)
+@permission_classes([AllowAny])
 def add_to_cart(request):
 
     product_id = request.data.get('product_id')
@@ -78,7 +86,7 @@ def add_to_cart(request):
     else:
         # For anonymous users, use session ID
         if 'cart_id' not in request.session:
-            cart = Cart.objects.create(user=request.user)
+            cart = Cart.objects.create(user=None)
             request.session['cart_id'] = cart.id
         else:
             cart_id = request.session.get('cart_id')
@@ -105,7 +113,7 @@ def add_to_cart(request):
 
 @csrf_exempt
 @api_view(['POST'])
-@permission_classes([IsAuthenticated])
+@permission_classes([AllowAny])
 def remove_from_cart(request):
 
     cart_item_id = request.data.get('cart_item_id')
@@ -140,7 +148,7 @@ def remove_from_cart(request):
 
 @csrf_exempt
 @api_view(['POST'])
-@permission_classes(IsAuthenticated)
+@permission_classes([AllowAny])
 def update_cart_quantity(request):
 
     item_id = request.data.get('item_id')
@@ -237,4 +245,3 @@ def register(request):
         user = serializer.save()
         return Response({"message":"user created successfully","user":UserSerialzer(user).data}, status=status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
