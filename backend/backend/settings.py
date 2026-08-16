@@ -149,6 +149,7 @@ CORS_ALLOWED_ORIGINS = [
     "http://127.0.0.1:5173",
     "https://meek-daifuku-ff4caf.netlify.app",
     "https://lively-cucurucho-5c6b54.netlify.app",
+    "https://shopnest-fullstack-2.onrender.com",
 ]
 
 CORS_ALLOW_CREDENTIALS = True
