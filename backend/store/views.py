@@ -25,7 +25,26 @@ def get_category(request):
     category = Category.objects.all()
     serializer = CategorySerialzer(category, many=True)
     return Response(serializer.data)
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def register(request):
+    serializer = RegisterSerilzer(data=request.data)
 
+    if serializer.is_valid():
+        user = serializer.save()
+
+        return Response(
+            {
+                "message": "user created successfully",
+                "user": UserSerialzer(user).data
+            },
+            status=status.HTTP_201_CREATED
+        )
+
+    return Response(
+        serializer.errors,
+        status=status.HTTP_400_BAD_REQUEST
+    )
 
 @api_view(['GET'])
 def get_product(request, product_id):
@@ -204,24 +223,58 @@ def update_cart_quantity(request):
         )
 @csrf_exempt
 @api_view(['POST'])
-@permission_classes([IsAuthenticated])
+@permission_classes([AllowAny])
 def create_order(request):
     try:
         data = request.data
-        name = data.get('name')
-        phone = data.get('phone')
-        payment_method = data.get('payment_method','COD')
+
+        name = data.get('name', '').strip()
+        phone = str(data.get('phone', '')).strip()
+        payment_method = data.get('payment_method', 'COD')
 
         if not phone.isdigit() or len(phone) < 10:
-            return Response({'error':'Invalid phone number'},status=400)
+            return Response(
+                {'error': 'Invalid phone number'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
 
-        cart, created = Cart.objects.get_or_create(user=request.user)
+        if request.user.is_authenticated:
+            cart = Cart.objects.filter(user=request.user).first()
+        else:
+            cart_id = request.session.get('cart_id')
+
+            if not cart_id:
+                return Response(
+                    {'error': 'Cart not found'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+            cart = Cart.objects.filter(
+                id=cart_id,
+                user__isnull=True
+            ).first()
+
+        if not cart:
+            return Response(
+                {'error': 'Cart not found'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
         if not cart.items.exists():
-            return Response({'error':'Cart is empty'},status=400)
+            return Response(
+                {'error': 'Cart is empty'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
 
-        total = sum(item.product.price * item.quantity for item in cart.items.all())
+        total = sum(
+            item.product.price * item.quantity
+            for item in cart.items.all()
+        )
 
-        order = Order.objects.create(user=request.user, total_amount=total)
+        order = Order.objects.create(
+            user=request.user if request.user.is_authenticated else None,
+            total_amount=total
+        )
 
         for item in cart.items.all():
             OrderItem.objects.create(
@@ -232,16 +285,19 @@ def create_order(request):
             )
 
         cart.items.all().delete()
-        return Response({'message':'Order successfully','order_id':order.id})
-    except Exception as e:
-        return Response({'error':str(e)},status=500)
 
- 
-@api_view(['POST'])
-@permission_classes([AllowAny])
-def register(request):
-    serializer = RegisterSerilzer(data=request.data)
-    if serializer.is_valid():
-        user = serializer.save()
-        return Response({"message":"user created successfully","user":UserSerialzer(user).data}, status=status.HTTP_201_CREATED)
-    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response(
+            {
+                'message': 'Order placed successfully',
+                'order_id': order.id,
+                'total_amount': float(total),
+                'payment_method': payment_method
+            },
+            status=status.HTTP_201_CREATED
+        )
+
+    except Exception as e:
+        return Response(
+            {'error': str(e)},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
