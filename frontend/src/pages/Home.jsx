@@ -1,15 +1,31 @@
+
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import ProductCard from "../components/ProductCard";
 import Footer from "../components/Footer";
+import Reveal from "../components/Reveal";
 
 const BASE_URL = (import.meta.env.VITE_DJANGO_BASE_URL || "http://127.0.0.1:8000").replace(/\/$/, "");
+<div className="bg-red-500 p-10 text-5xl font-bold text-white">
+  TAILWIND TEST
+</div>
+const categoryVisuals = {
+  Electronics: { icon: "⌁", tone: "gold", image: "https://images.unsplash.com/photo-1498049794561-7780e7231661?auto=format&fit=crop&w=700&q=80" },
+  Fashion: { icon: "✦", tone: "rose", image: "https://images.unsplash.com/photo-1445205170230-053b83016050?auto=format&fit=crop&w=700&q=80" },
+  "Home & Kitchen": { icon: "⌂", tone: "sage", image: "https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?auto=format&fit=crop&w=700&q=80" },
+  Beauty: { icon: "✧", tone: "peach", image: "https://images.unsplash.com/photo-1596462502278-27bfdc403348?auto=format&fit=crop&w=700&q=80" },
+  Sports: { icon: "◉", tone: "blue", image: "https://images.unsplash.com/photo-1461896836934-ffe607ba8211?auto=format&fit=crop&w=700&q=80" },
+  Books: { icon: "▤", tone: "lavender", image: "https://images.unsplash.com/photo-1495446815901-a7297e633e8d?auto=format&fit=crop&w=700&q=80" },
+};
+
+const fallbackCategories = ["Electronics", "Fashion", "Home & Kitchen", "Beauty", "Sports", "Books"];
 
 function Home() {
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [seconds, setSeconds] = useState(6 * 60 * 60 + 42 * 60 + 18);
 
   useEffect(() => {
     const load = async () => {
@@ -32,73 +48,218 @@ function Home() {
     load();
   }, []);
 
+  useEffect(() => {
+    const timer = setInterval(() => setSeconds((value) => (value > 0 ? value - 1 : 24 * 60 * 60)), 1000);
+    return () => clearInterval(timer);
+  }, []);
+
   const featured = useMemo(() => products.slice(0, 5), [products]);
+  const trending = useMemo(() => products.slice(5, 9), [products]);
+
+  const time = {
+    h: String(Math.floor(seconds / 3600)).padStart(2, "0"),
+    m: String(Math.floor((seconds % 3600) / 60)).padStart(2, "0"),
+    s: String(seconds % 60).padStart(2, "0"),
+  };
+
+  const shownCategories = categories.length ? categories.slice(0, 6) : fallbackCategories;
 
   return (
     <>
-      <main>
-        <section className="relative overflow-hidden bg-[#2c2b4b]">
-          <img
-            src="https://cdn11.bigcommerce.com/s-gmsn9rvs48/images/stencil/original/carousel/3/slider-01.jpg?c=1"
-            alt="Featured electronics"
-            className="absolute inset-0 h-full w-full object-cover opacity-70"
-          />
-          <div className="relative mx-auto flex min-h-[520px] max-w-7xl items-center px-5 py-16 sm:px-6">
-            <div className="max-w-xl text-white">
-              <p className="mb-4 inline-block rounded-full bg-yellow-400 px-5 py-2 font-bold text-slate-900">Great offers every week</p>
-              <h1 className="text-5xl font-black leading-tight sm:text-6xl">Smart gadgets.<br />Better prices.</h1>
-              <p className="mt-5 max-w-lg text-lg text-white/85">Discover products from your Django database through a modern React storefront.</p>
-              <Link to="/products" className="mt-8 inline-flex rounded-full bg-white px-7 py-3 font-bold text-[#24364a] transition hover:bg-yellow-400">Shop Now →</Link>
+      <main className="home-page">
+        {/* Announcement ticker */}
+        <div className="announcement">
+          <div className="announcement-track">
+            <span>✦ Free delivery on selected orders</span>
+            <span>✦ Easy 7-day returns</span>
+            <span>✦ Fresh deals added every week</span>
+            <span>✦ Secure checkout</span>
+            <span>✦ Free delivery on selected orders</span>
+            <span>✦ Easy 7-day returns</span>
+            <span>✦ Fresh deals added every week</span>
+          </div>
+        </div>
+
+        {/* Hero */}
+        <section className="hero-modern">
+          <div className="hero-grid-glow" />
+          <div className="hero-orb hero-orb-one" />
+          <div className="hero-orb hero-orb-two" />
+          <div className="hero-particles" aria-hidden="true">
+            {Array.from({ length: 18 }).map((_, index) => <i key={index} style={{ "--i": index }} />)}
+          </div>
+
+          <div className="hero-inner">
+            <Reveal className="hero-copy">
+              <span className="eyebrow-pill"><span className="pulse-dot" /> New season picks</span>
+              <h1>Find something <em>worth loving.</em></h1>
+              <p>Curated everyday essentials, smart gadgets and style picks — all in one beautiful place.</p>
+              <div className="hero-actions">
+                <Link to="/products" className="btn-primary shine-btn">Shop the collection <span>→</span></Link>
+                <Link to="/products" className="btn-ghost">Explore categories</Link>
+              </div>
+              <div className="hero-proof">
+                <div className="avatar-stack"><span>🧑🏻</span><span>👩🏽</span><span>🧑🏾</span><span>+</span></div>
+                <div><strong>Loved by everyday shoppers</strong><small>Fresh products · Simple shopping</small></div>
+              </div>
+            </Reveal>
+
+            <Reveal className="hero-showcase" delay={120}>
+              <div className="hero-card-back" />
+              <div className="hero-product-stage">
+                <div className="sale-bubble">UP TO<br /><strong>50%</strong><br />OFF</div>
+                <div className="hero-ring" />
+                <img
+                  src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=1000&q=85"
+                  alt="Featured headphones"
+                  className="hero-product-image"
+                />
+                <div className="floating-tag tag-one">★ 4.8 rating</div>
+                <div className="floating-tag tag-two">Fast delivery</div>
+              </div>
+            </Reveal>
+          </div>
+        </section>
+
+        {/* Benefits */}
+        <section className="benefit-strip">
+          {[
+            ["↗", "Free delivery", "On selected orders"],
+            ["✓", "Secure payment", "Protected checkout"],
+            ["↻", "Easy returns", "7-day return window"],
+            ["♡", "Helpful support", "We're here to help"],
+          ].map(([icon, title, text], index) => (
+            <Reveal key={title} delay={index * 70} className="benefit-item">
+              <span className="benefit-icon">{icon}</span>
+              <span><strong>{title}</strong><small>{text}</small></span>
+            </Reveal>
+          ))}
+        </section>
+
+        {/* Categories */}
+        <section className="section-wrap">
+          <Reveal className="section-heading">
+            <div><span className="section-kicker">Browse by mood</span><h2>Shop your way</h2></div>
+            <Link to="/products" className="section-link">View all <span>→</span></Link>
+          </Reveal>
+          <div className="category-grid">
+            {shownCategories.map((category, index) => {
+              const name = category.name || category;
+              const visual = categoryVisuals[name] || categoryVisuals.Electronics;
+              return (
+                <Reveal key={category.id || name} delay={index * 70}>
+                  <Link to="/products" className={`category-card tone-${visual.tone}`}>
+                    <div className="category-image-wrap"><img src={visual.image} alt="" /></div>
+                    <div className="category-overlay" />
+                    <div className="category-info">
+                      <span className="category-icon">{visual.icon}</span>
+                      <strong>{name}</strong>
+                      <small>Explore collection →</small>
+                    </div>
+                  </Link>
+                </Reveal>
+              );
+            })}
+          </div>
+        </section>
+
+        {/* Animated promo */}
+        <section className="section-wrap">
+          <Reveal className="promo-banner">
+            <div className="promo-copy">
+              <span className="promo-label">Limited-time drop</span>
+              <h2>Big finds.<br /><em>Better prices.</em></h2>
+              <p>Fresh picks are waiting. Catch today's favourites before the deal disappears.</p>
+              <Link to="/products" className="btn-primary shine-btn">Shop deals →</Link>
             </div>
-          </div>
-        </section>
-
-        <section className="border-b bg-white py-9">
-          <div className="mx-auto max-w-7xl px-5 sm:px-6">
-            <div className="grid grid-cols-2 gap-5 sm:grid-cols-3 md:grid-cols-5">
-              {(categories.length ? categories.slice(0, 5) : ["Gadgets", "Electronics", "Kitchen", "Garden", "Accessories"]).map((category) => (
-                <Link key={category.id || category} to="/products" className="rounded-2xl bg-slate-50 p-5 text-center transition hover:-translate-y-1 hover:bg-yellow-50">
-                  <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-white text-2xl shadow">{category.name ? "🛍️" : "✨"}</div>
-                  <p className="font-bold text-slate-800">{category.name || category}</p>
-                  <span className="text-xs text-slate-500">View products</span>
-                </Link>
-              ))}
+            <div className="promo-art">
+              <div className="promo-glow" />
+              <div className="promo-circle" />
+              <img src="https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=800&q=85" alt="Featured watch" />
+              <span className="promo-floating">TRENDING</span>
             </div>
-          </div>
+            <div className="promo-sparkles" aria-hidden="true"><i /><i /><i /><i /><i /></div>
+          </Reveal>
         </section>
 
-        <section id="deals" className="mx-auto grid max-w-7xl gap-6 px-5 py-10 sm:px-6 md:grid-cols-2">
-          <div className="relative min-h-64 overflow-hidden rounded-2xl bg-slate-900">
-            <img src="https://cdn11.bigcommerce.com/s-gmsn9rvs48/product_images/uploaded_images/top-banner-01.jpg" alt="Smart watches" className="absolute inset-0 h-full w-full object-cover opacity-75" />
-            <div className="relative z-10 p-8 text-white"><p>New Generation</p><h2 className="mt-1 text-3xl font-black">Smart Watches</h2><Link to="/products" className="mt-4 inline-block underline">Shop Now →</Link></div>
-          </div>
-          <div className="relative min-h-64 overflow-hidden rounded-2xl bg-yellow-100">
-            <img src="https://cdn11.bigcommerce.com/s-gmsn9rvs48/product_images/uploaded_images/top-banner-02.jpg" alt="New gadgets" className="absolute inset-0 h-full w-full object-cover opacity-80" />
-            <div className="relative z-10 p-8 text-slate-900"><p>Weekly deals</p><h2 className="mt-1 text-3xl font-black">New Gadgets</h2><Link to="/products" className="mt-4 inline-block underline">Explore →</Link></div>
-          </div>
+        {/* Best sellers */}
+        <section className="section-wrap products-section" id="featured">
+          <Reveal className="section-heading">
+            <div><span className="section-kicker">Most wanted</span><h2>Best sellers</h2><p>Popular picks from your Django catalog.</p></div>
+            <Link to="/products" className="section-link">Shop all <span>→</span></Link>
+          </Reveal>
+          {loading ? (
+            <div className="product-grid">{Array.from({ length: 5 }).map((_, i) => <div className="product-skeleton" key={i}><div /><span /><span /></div>)}</div>
+          ) : error ? (
+            <p className="state-card">{error}</p>
+          ) : featured.length ? (
+            <div className="product-grid">{featured.map((product, index) => <Reveal key={product.id} delay={index * 80}><ProductCard product={product} compact /></Reveal>)}</div>
+          ) : (
+            <p className="state-card">Add products from Django Admin and they will appear here.</p>
+          )}
         </section>
 
-        <section id="featured" className="bg-slate-100 py-14">
-          <div className="mx-auto max-w-7xl px-5 sm:px-6">
-            <div className="mb-8 flex items-end justify-between gap-4">
-              <div><p className="text-sm font-bold uppercase tracking-widest text-yellow-600">From your Django API</p><h2 className="mt-1 text-3xl font-black text-slate-900">Best Sellers</h2></div>
-              <Link to="/products" className="font-bold text-blue-700 hover:underline">View all →</Link>
+        {/* Flash sale */}
+        <section className="section-wrap" id="deals">
+          <Reveal className="flash-sale">
+            <div>
+              <span className="flash-kicker">⚡ Flash sale</span>
+              <h2>Deals that won't wait.</h2>
+              <p>Grab a favourite before the timer hits zero.</p>
             </div>
-            {loading ? <p className="rounded-2xl bg-white p-8 text-center">Loading products...</p> : error ? <p className="rounded-2xl bg-white p-8 text-center text-red-600">{error}</p> : featured.length ? <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-5">{featured.map((product) => <ProductCard key={product.id} product={product} compact />)}</div> : <p className="rounded-2xl bg-white p-8 text-center">No products in the database yet.</p>}
-          </div>
+            <div className="countdown">
+              <div><strong>{time.h}</strong><small>HRS</small></div><b>:</b>
+              <div><strong>{time.m}</strong><small>MIN</small></div><b>:</b>
+              <div><strong>{time.s}</strong><small>SEC</small></div>
+            </div>
+            <Link to="/products" className="flash-button">See deals →</Link>
+          </Reveal>
         </section>
 
-        <section className="mx-auto max-w-7xl px-5 py-12 sm:px-6">
-          <div className="relative overflow-hidden rounded-3xl bg-slate-900">
-            <img src="https://cdn11.bigcommerce.com/s-gmsn9rvs48/product_images/uploaded_images/sub-banner-01.jpg" alt="Hot deals" className="absolute inset-0 h-full w-full object-cover opacity-70" />
-            <div className="relative px-7 py-16 text-white sm:px-12"><p className="text-sm uppercase tracking-widest text-yellow-400">Shop and save</p><h2 className="mt-2 max-w-xl text-4xl font-black">Hot deals on smart phones and electronics</h2><Link to="/products" className="mt-7 inline-flex rounded-full bg-yellow-400 px-6 py-3 font-bold text-slate-900">Browse Products</Link></div>
-          </div>
+        {/* Trending */}
+        {trending.length > 0 && (
+          <section className="section-wrap">
+            <Reveal className="section-heading">
+              <div><span className="section-kicker">Fresh on the shelf</span><h2>Trending now</h2></div>
+              <Link to="/products" className="section-link">Discover more <span>→</span></Link>
+            </Reveal>
+            <div className="product-grid trending-grid">{trending.map((product, index) => <Reveal key={product.id} delay={index * 90}><ProductCard product={product} compact /></Reveal>)}</div>
+          </section>
+        )}
+
+        {/* Story / stats */}
+        <section className="section-wrap">
+          <Reveal className="story-panel">
+            <div className="story-copy">
+              <span className="section-kicker">Why ShopNest</span>
+              <h2>Shopping should feel <em>simple.</em></h2>
+              <p>We keep the experience clean: easy discovery, honest product details, clear pricing and a checkout that doesn't get in your way.</p>
+              <div className="story-stats">
+                <div><strong>24/7</strong><small>store access</small></div>
+                <div><strong>7 day</strong><small>easy returns</small></div>
+                <div><strong>100%</strong><small>secure checkout</small></div>
+              </div>
+            </div>
+            <div className="story-visual">
+              <div className="story-card story-card-main">
+                <span>SHOPNEST</span>
+                <strong>Good things<br />are closer.</strong>
+                <Link to="/products">Start exploring →</Link>
+              </div>
+              <div className="story-card story-card-float">✦<br /><small>Curated picks</small></div>
+            </div>
+          </Reveal>
         </section>
 
-        <section className="bg-[#2a3b4e] py-10 text-white">
-          <div className="mx-auto grid max-w-7xl gap-6 px-5 sm:px-6 sm:grid-cols-2 lg:grid-cols-4">
-            {[['🚚','Free Delivery','On selected orders'],['🏷️','Great Deals','Fresh offers weekly'],['🎧','Best Support','Here when you need us'],['🔒','Secure Shopping','Protected checkout']].map(([icon,title,text]) => <div key={title} className="flex items-center gap-4"><div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[#172330] text-xl">{icon}</div><div><p className="font-bold text-yellow-400">{title}</p><p className="text-xs text-white/80">{text}</p></div></div>)}
-          </div>
+        {/* Newsletter */}
+        <section className="section-wrap">
+          <Reveal className="newsletter">
+            <div><span className="section-kicker">Stay in the loop</span><h2>Deals worth opening.</h2><p>Get new arrivals and special offers without the noise.</p></div>
+            <form onSubmit={(event) => event.preventDefault()} className="newsletter-form">
+              <input type="email" placeholder="Your email address" aria-label="Your email address" />
+              <button className="btn-primary">Join ShopNest</button>
+            </form>
+          </Reveal>
         </section>
       </main>
       <Footer />

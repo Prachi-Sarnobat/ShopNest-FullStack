@@ -1,30 +1,94 @@
+import "./Footer.css";
+
 function Footer() {
   return (
-    <footer id="footer" className="mt-16 bg-[#24364a] text-slate-300">
-      <div className="bg-yellow-400 py-5">
-        <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-3 px-4 sm:flex-row sm:px-6">
-          <p className="font-bold text-slate-900">📦 Sign up for our newsletter</p>
-          <div className="flex w-full max-w-md overflow-hidden rounded-lg bg-white">
-            <input className="min-w-0 flex-1 px-4 py-2 text-sm text-slate-900 outline-none" placeholder="Your email address" />
-            <button className="bg-[#24364a] px-5 text-sm font-bold text-white">Subscribe</button>
+    <footer id="footer" className="shop-footer">
+      <div className="shop-footer-newsletter">
+        <div className="shop-footer-newsletter-inner">
+          <div>
+            <span className="shop-footer-kicker">STAY IN THE LOOP</span>
+            <h2>Fresh finds. Better shopping.</h2>
+            <p>Get new arrivals, exclusive deals and shopping inspiration.</p>
+          </div>
+
+          <form
+            className="shop-footer-subscribe"
+            onSubmit={(event) => event.preventDefault()}
+          >
+            <input
+              type="email"
+              placeholder="Your email address"
+              aria-label="Your email address"
+            />
+            <button type="submit">Subscribe →</button>
+          </form>
+        </div>
+      </div>
+
+      <div className="shop-footer-main">
+        <div className="shop-footer-grid">
+          <div className="shop-footer-brand">
+            <a href="/" className="shop-footer-logo">
+              Shop<span>Nest</span>
+            </a>
+            <p>
+              A full-stack e-commerce project powered by React,
+              Django and Django REST Framework.
+            </p>
+
+            <div className="shop-footer-socials">
+              <a href="#!" aria-label="Instagram">◎</a>
+              <a href="#!" aria-label="Facebook">f</a>
+              <a href="#!" aria-label="X">𝕏</a>
+              <a href="#!" aria-label="YouTube">▶</a>
+            </div>
+          </div>
+
+          <div className="shop-footer-column">
+            <h3>Navigate</h3>
+            <a href="/">Home</a>
+            <a href="/products">Shop All</a>
+            <a href="/#featured">Featured Products</a>
+            <a href="/#deals">Deals</a>
+          </div>
+
+          <div className="shop-footer-column">
+            <h3>Support</h3>
+            <a href="#!">Shipping & Delivery</a>
+            <a href="#!">Returns</a>
+            <a href="#!">FAQs</a>
+            <a href="#!">Contact Us</a>
+          </div>
+
+          <div className="shop-footer-column">
+            <h3>Let's talk</h3>
+            <p>Have a question? We'd love to hear from you.</p>
+            <a href="mailto:support@shopnest.local">
+              support@shopnest.local
+            </a>
+            <span>Mon–Sat · 9 AM–6 PM</span>
           </div>
         </div>
       </div>
-      <div className="mx-auto grid max-w-7xl gap-10 px-4 py-14 sm:px-6 md:grid-cols-3">
-        <div>
-          <h3 className="mb-3 text-xl font-black text-white">ShopNest</h3>
-          <p className="text-sm leading-6">A full-stack e-commerce project powered by React, Django and Django REST Framework.</p>
+
+      <div className="shop-footer-bottom">
+        <span>© 2026 ShopNest. All rights reserved.</span>
+
+        <div className="shop-footer-trust">
+          <span>Secure checkout</span>
+          <b>•</b>
+          <span>Fast delivery</span>
+          <b>•</b>
+          <span>Easy returns</span>
         </div>
-        <div>
-          <h4 className="mb-3 font-bold text-white">Navigate</h4>
-          <div className="space-y-2 text-sm"><p>Home</p><p>Shop All</p><p>Featured Products</p><p>Deals</p></div>
-        </div>
-        <div>
-          <h4 className="mb-3 font-bold text-white">Support</h4>
-          <div className="space-y-2 text-sm"><p>support@shopnest.local</p><p>+91 0123 45678</p><p>Mon–Sat · 9 AM–6 PM</p></div>
-        </div>
+
+        <button
+          type="button"
+          onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+        >
+          ↑ Back to top
+        </button>
       </div>
-      <div className="border-t border-white/10 py-5 text-center text-xs">Built with React + Django REST Framework · © 2026 ShopNest</div>
     </footer>
   );
 }
