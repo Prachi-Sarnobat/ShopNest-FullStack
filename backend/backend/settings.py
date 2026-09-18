@@ -1,4 +1,3 @@
-
 """
 Django settings for backend project.
 
@@ -27,14 +26,21 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = os.getenv("DJANGO_SECRET_KEY")
 
-DEBUG = True
+# Was hardcoded True — now driven by env var, defaults to False (safe for production).
+# On Render, only set DJANGO_DEBUG=True temporarily if you need to debug a live error.
+DEBUG = os.getenv("DJANGO_DEBUG", "False") == "True"
 
 ALLOWED_HOSTS = [
     "shopnest-fullstack.onrender.com",
-    "shopnest-fullstack-1.onrender.com",
+    "shopnest-fullstack-2.onrender.com",
     "localhost",
     "127.0.0.1",
 ]
+
+# NEW: Render terminates SSL at its proxy and forwards plain HTTP internally.
+# Without this, Django thinks every request is insecure, which can silently
+# break SESSION_COOKIE_SECURE / CSRF_COOKIE_SECURE below.
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
 
 # --------------------------------------------------
@@ -198,19 +204,28 @@ CORS_ALLOW_CREDENTIALS = True
 
 
 # --------------------------------------------------
+# CSRF
+# --------------------------------------------------
+
+# NEW: needed for Django admin (session-based login) to work when accessed
+# cross-origin/cross-scheme in production. Without this, admin login POSTs
+# can fail with a 403 CSRF error even though CORS is configured correctly.
+CSRF_TRUSTED_ORIGINS = [
+    "https://shopnest-fullstack.onrender.com",
+    "https://shopnest-fullstack-2.onrender.com",
+    "https://meek-daifuku-ff4caf.netlify.app",
+]
+
+CSRF_COOKIE_SAMESITE = "None"
+CSRF_COOKIE_SECURE = True
+
+
+# --------------------------------------------------
 # Session cookies
 # --------------------------------------------------
 
 SESSION_COOKIE_SAMESITE = "None"
 SESSION_COOKIE_SECURE = True
-
-
-# --------------------------------------------------
-# CSRF
-# --------------------------------------------------
-
-CSRF_COOKIE_SAMESITE = "None"
-CSRF_COOKIE_SECURE = True
 
 
 # --------------------------------------------------
