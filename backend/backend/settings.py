@@ -196,6 +196,9 @@ CORS_ALLOWED_ORIGINS = [
     "https://meek-daifuku-ff4caf.netlify.app",
     "https://lively-cucurucho-5c6b54.netlify.app",
 
+    # Vercel
+    "https://shop-nest-full-stack-w3cq.vercel.app",
+
     # Render frontend
     "https://shopnest-fullstack-2.onrender.com",
 ]
