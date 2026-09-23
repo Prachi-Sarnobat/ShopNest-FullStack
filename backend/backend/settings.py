@@ -26,20 +26,21 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = os.getenv("DJANGO_SECRET_KEY")
 
-# Was hardcoded True — now driven by env var, defaults to False (safe for production).
-# On Render, only set DJANGO_DEBUG=True temporarily if you need to debug a live error.
 DEBUG = os.getenv("DJANGO_DEBUG", "False") == "True"
 
 ALLOWED_HOSTS = [
-    "shopnest-fullstack.onrender.com",
-    "shopnest-fullstack-2.onrender.com",
     "localhost",
     "127.0.0.1",
 ]
 
-# NEW: Render terminates SSL at its proxy and forwards plain HTTP internally.
-# Without this, Django thinks every request is insecure, which can silently
-# break SESSION_COOKIE_SECURE / CSRF_COOKIE_SECURE below.
+# NEW: Render automatically sets RENDER_EXTERNAL_HOSTNAME to this service's
+# own live hostname. Adding it here means ALLOWED_HOSTS auto-updates itself
+# whenever you create a new Render service or the URL changes — no more
+# manually editing this file every time.
+RENDER_EXTERNAL_HOSTNAME = os.getenv("RENDER_EXTERNAL_HOSTNAME")
+if RENDER_EXTERNAL_HOSTNAME:
+    ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
+
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
 
@@ -198,9 +199,6 @@ CORS_ALLOWED_ORIGINS = [
 
     # Vercel
     "https://shop-nest-full-stack-w3cq.vercel.app",
-
-    # Render frontend
-    "https://shopnest-fullstack-2.onrender.com",
 ]
 
 CORS_ALLOW_CREDENTIALS = True
@@ -210,14 +208,15 @@ CORS_ALLOW_CREDENTIALS = True
 # CSRF
 # --------------------------------------------------
 
-# NEW: needed for Django admin (session-based login) to work when accessed
-# cross-origin/cross-scheme in production. Without this, admin login POSTs
-# can fail with a 403 CSRF error even though CORS is configured correctly.
 CSRF_TRUSTED_ORIGINS = [
-    "https://shopnest-fullstack.onrender.com",
-    "https://shopnest-fullstack-2.onrender.com",
     "https://meek-daifuku-ff4caf.netlify.app",
+    "https://shop-nest-full-stack-w3cq.vercel.app",
 ]
+
+# NEW: same auto-updating trick as ALLOWED_HOSTS above, so admin login works
+# on whatever Render URL this service currently has.
+if RENDER_EXTERNAL_HOSTNAME:
+    CSRF_TRUSTED_ORIGINS.append(f"https://{RENDER_EXTERNAL_HOSTNAME}")
 
 CSRF_COOKIE_SAMESITE = "None"
 CSRF_COOKIE_SECURE = True
