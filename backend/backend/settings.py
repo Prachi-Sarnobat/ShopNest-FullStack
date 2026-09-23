@@ -198,7 +198,6 @@ CORS_ALLOWED_ORIGINS = [
     "https://lively-cucurucho-5c6b54.netlify.app",
 
     # Vercel
-    "https://shop-nest-full-stack-w3cq.vercel.app",
 ]
 
 CORS_ALLOW_CREDENTIALS = True
